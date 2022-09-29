@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">CConverter</string>
+    <string name="amount">Amount</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="convert">Convert</string>
+    <string name="default_amount">1.0</string>
+</resources>
