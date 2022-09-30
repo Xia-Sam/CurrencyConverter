@@ -21,9 +21,14 @@ The third-party library Retrofit is used for making HTTP request. Reasons why I 
 ### Bugs encountered and how I solved them:
   1. socket failed: EPERM (Operation not permitted)   
 After entering the app, it gives me a toast about this error. Through googling, I found this can be easily solved by uninstalling the app and running it again. The reason is that I forgot to add internet permission in my first installation. Then the OS thought the app doesn't need internet permission and would not check any permission update to the app. Therefore, to tell the Android OS to check updated permission, what we can do is to uninstall the app first before installing again.
-  3. After clicking the convert button, the result is always the same as the input amount   
-After getting this bug, I checked whether my api is working fine or not. Then through debugging, I found the base code and target code have never changed. Since api is working fine, some part of my logic should be wrong. After checking my code, I found the problem inside the function onItemSelected. This function contains the logic to find the right spinner to update the base code and target code. To find which spinner has been clicked, the first parameter of type AdapterView should be checked but not the second parameter of type View.
+  2. After clicking the convert button, the result is always the same as the input amount   
+After getting this bug, I checked whether my api is working fine or not. Then through debugging, I found the base code and target code have never changed. Since api is working fine, some part of my logic should be wrong. After checking my code, I found the problem inside the function onItemSelected. This function contains the logic to find the right spinner to update the base code and target code. To find which spinner has been clicked, the first parameter of type AdapterView should be checked but not the second parameter of type View.    
+  3. android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views    
+This bug happens when I try to show a toast in the network callback. It reminds me that in Android, only the main thread can update views. When this is done from a worker thread, an exception is thrown. So I launched a coroutine with 'Dispatchers.Main' passed to show the toast hence the problem is solved.
   
 ### Further improvements in the future:
 
 ### versions until now:
+
+  release v2: add error handling for no internet and invalid API key, last updated time, network monitor    
+  release v1
