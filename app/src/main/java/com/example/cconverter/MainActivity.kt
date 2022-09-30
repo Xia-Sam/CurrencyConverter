@@ -13,6 +13,7 @@ import datasource.SupportedCodes
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import network.NetworkMonitor
 
 const val TAG = "MainActivity"
 
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             R.id.button_convert -> showResult()
         }
     }
+    private val networkMonitor = NetworkMonitor()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,6 +78,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         })
 
         binding.buttonConvert.setOnClickListener(clickListener)
+        networkMonitor.init(this)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        networkMonitor.finish()
     }
 
     private fun showResult() {
@@ -93,8 +101,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 if (response.body() == null) {
                     Utils.showToast(this@MainActivity, "API key is invalid")
                 } else {
-                    binding.timeLastUpdated.text = response.body()!!.time_last_update_utc
-                    binding.afterAmount.text = response.body()!!.conversion_result.toString()
+                    binding.timeLastUpdated.text = response.body()?.time_last_update_utc
+                    binding.afterAmount.text = response.body()?.conversion_result.toString()
                 }
             }
 
