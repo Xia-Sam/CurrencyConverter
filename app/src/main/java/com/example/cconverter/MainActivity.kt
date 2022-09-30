@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import com.example.cconverter.databinding.ActivityMainBinding
 import datasource.ExtrangeRateApi
 import datasource.PairConversion
@@ -41,7 +40,9 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 call: Call<SupportedCodes>,
                 response: Response<SupportedCodes>
             ) {
-                if (response.isSuccessful and (response.body()!!.result == "success")) {
+                if (response.body() == null) {
+                    Utils.showToast(this@MainActivity, "API key is invalid")
+                } else {
                     supportedCodes = response.body()!!.supported_codes
                     Log.d(TAG, "supported code obtained successfully")
 
@@ -52,12 +53,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     )
                     arrayAdapter
                         .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    with (binding.toCurrency) {
+                    with(binding.toCurrency) {
                         adapter = arrayAdapter
                         setSelection(0, false)
                         onItemSelectedListener = this@MainActivity
                     }
-                    with (binding.fromCurrency) {
+                    with(binding.fromCurrency) {
                         adapter = arrayAdapter
                         setSelection(0, false)
                         onItemSelectedListener = this@MainActivity
@@ -66,7 +67,10 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
 
             override fun onFailure(call: Call<SupportedCodes>, t: Throwable) {
-                Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_SHORT).show()
+                Utils.showToast(
+                    this@MainActivity,
+                    "Failed to call API, error: " + "${t.message}"
+                )
             }
 
         })
@@ -77,21 +81,28 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private fun showResult() {
         amount = binding.amount.text.toString().toFloat()
         val call = extrangeRateApi.getConversionResult(baseCode, targetCode, amount)
-        Log.d(TAG, "Conversion result requested: " +
-                "baseCode: $baseCode, targetCode: $targetCode, amount: $amount")
+        Log.d(
+            TAG, "Conversion result requested: " +
+                    "baseCode: $baseCode, targetCode: $targetCode, amount: $amount"
+        )
         call.enqueue(object : Callback<PairConversion> {
             override fun onResponse(
                 call: Call<PairConversion>,
                 response: Response<PairConversion>
             ) {
-                if (response.isSuccessful and (response.body()!!.result == "success")) {
+                if (response.body() == null) {
+                    Utils.showToast(this@MainActivity, "API key is invalid")
+                } else {
                     val conversionResult = response.body()!!.conversion_result
                     binding.afterAmount.text = conversionResult.toString()
                 }
             }
 
             override fun onFailure(call: Call<PairConversion>, t: Throwable) {
-                Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_SHORT).show()
+                Utils.showToast(
+                    this@MainActivity,
+                    "Failed to call API, error: " + "${t.message}"
+                )
             }
 
         })
