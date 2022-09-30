@@ -34,7 +34,7 @@ This bug happens when I try to show a toast in the network callback. It reminds 
 ### Further improvements in the future:
   1. user account: Each user can use their email address and password to login to the app.
   2. in-app advertisements: We can show in-app advertisements to users to make profits.
-  3. nation flags for currencies: A national flag can be put next to the currency code, which will speed up the process of choosing the right currency for users. Since images are sometimes more obvious than text. 
+  3. nation flags for currencies: A national flag can be put next to the currency code, which will speed up the process of choosing the right currency for users. Since images are sometimes more conspicuous than text. 
   4. payment: Users can make payments to get some priviliges, e.g. subscription for no in-app advertisements, unlimited amount of request per month etc.
 
 ### versions until now:
