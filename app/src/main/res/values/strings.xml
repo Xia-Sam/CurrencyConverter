@@ -6,4 +6,5 @@
     <string name="convert">Convert</string>
     <string name="default_amount">1.0</string>
     <string name="last_updated_time">Last updated time</string>
+    <string name="preference_file_name">cconverter</string>
 </resources>

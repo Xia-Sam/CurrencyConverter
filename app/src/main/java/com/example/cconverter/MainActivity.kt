@@ -1,5 +1,7 @@
 package com.example.cconverter
 
+import android.content.Context
+import androidx.lifecycle.lifecycleScope
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -7,9 +9,15 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.example.cconverter.databinding.ActivityMainBinding
+import database.DataSource
+import database.SupportedCode
+import database.SupportedCodeDao
 import datasource.ExtrangeRateApi
 import datasource.PairConversion
 import datasource.SupportedCodes
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,24 +38,35 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         }
     }
     private val networkMonitor = NetworkMonitor()
+    private lateinit var dataBase: SupportedCodeDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val call = extrangeRateApi.getSupportedCodes()
-        call.enqueue(object : Callback<SupportedCodes> {
-            override fun onResponse(
-                call: Call<SupportedCodes>,
-                response: Response<SupportedCodes>
-            ) {
-                if (response.body() == null) {
-                    Utils.showToast(this@MainActivity, "API key is invalid")
-                } else {
-                    supportedCodes = response.body()!!.supported_codes
-                    Log.d(TAG, "supported code obtained successfully")
+        networkMonitor.init(this)
+        dataBase = DataSource.getDao(this)
 
+        try {
+            lifecycleScope.launch(Dispatchers.IO) {
+                if (networkMonitor.isNetworkAvailable()) {
+                    // Update local database
+                    val response = extrangeRateApi.getSupportedCodes().execute()
+                    supportedCodes = response.body()!!.supported_codes
+                    dataBase.removeAllSupportedCodes()
+                    for (codeList in supportedCodes) {
+                        dataBase.insertSupportedCode(SupportedCode(0, codeList[0], codeList[1]))
+                    }
+                } else {
+                    // Get supported codes from local database
+                    val l = mutableListOf<List<String>>()
+                    for (scode in dataBase.getAllSupportedCodes()) {
+                        l.add(listOf(scode.code, scode.currency))
+                    }
+                    supportedCodes = l
+                }
+                lifecycleScope.launch(Dispatchers.Main) {
                     val arrayAdapter = ArrayAdapter(
                         this@MainActivity,
                         android.R.layout.simple_spinner_item,
@@ -67,18 +86,11 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     }
                 }
             }
-
-            override fun onFailure(call: Call<SupportedCodes>, t: Throwable) {
-                Utils.showToast(
-                    this@MainActivity,
-                    "Failed to call API, error: " + "${t.message}"
-                )
-            }
-
-        })
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         binding.buttonConvert.setOnClickListener(clickListener)
-        networkMonitor.init(this)
     }
 
     override fun onDestroy() {

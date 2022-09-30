@@ -3,6 +3,7 @@ package network
 import android.content.Context
 import android.content.Intent
 import android.net.*
+import android.os.Build
 import android.provider.Settings
 import androidx.core.content.ContextCompat.startActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -51,5 +52,26 @@ class NetworkMonitor {
 
     fun finish() {
         connectivityManager.unregisterNetworkCallback(networkCallback)
+    }
+
+    fun isNetworkAvailable(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            if (capabilities != null) {
+                when {
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
+                        return true
+                    }
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
+                        return true
+                    }
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
     }
 }
