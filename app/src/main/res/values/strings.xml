@@ -5,4 +5,5 @@
     <string name="to">To</string>
     <string name="convert">Convert</string>
     <string name="default_amount">1.0</string>
+    <string name="last_updated_time">Last updated time</string>
 </resources>

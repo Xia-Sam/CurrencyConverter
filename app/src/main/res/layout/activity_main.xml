@@ -7,6 +7,29 @@
     tools:context=".MainActivity">
 
     <LinearLayout
+        android:id="@+id/last_updated_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/last_updated_time"/>
+        <TextView
+            android:id="@+id/time_last_updated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:fontFamily="sans-serif-condensed-medium"
+            tools:text="Fri, 27 Mar 2020 00:00:00 +0000"/>
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/group1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,7 +37,7 @@
         android:orientation="vertical"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/last_updated_time">
 
         <TextView
             android:layout_width="match_parent"

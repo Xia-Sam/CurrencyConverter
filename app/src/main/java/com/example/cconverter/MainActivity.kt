@@ -93,8 +93,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 if (response.body() == null) {
                     Utils.showToast(this@MainActivity, "API key is invalid")
                 } else {
-                    val conversionResult = response.body()!!.conversion_result
-                    binding.afterAmount.text = conversionResult.toString()
+                    binding.timeLastUpdated.text = response.body()!!.time_last_update_utc
+                    binding.afterAmount.text = response.body()!!.conversion_result.toString()
                 }
             }
 
