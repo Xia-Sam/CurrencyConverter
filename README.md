@@ -17,6 +17,11 @@ The third-party library Retrofit is used for making HTTP request. Reasons why I 
   4. Faster compared to other libraries
   5. Support both synchronous and asynchronous network request
   6. I'm more familiar with it because I have used it in my last job
+  
+Room is used to store data locally. The app needs local database because we want users can still use the app when network is not available, though the data stored may not be up-to-date. Reasons why I choose database instead of sharedPreferences:
+  1. data types that can be stored in sharedPreferences are very limited
+  2. each piece of data needs an associated key
+  3. in the future, we may have more data to store so Room database is more powerful and will meet our future requirements
 
 ### Bugs encountered and how I solved them:
   1. socket failed: EPERM (Operation not permitted)   
