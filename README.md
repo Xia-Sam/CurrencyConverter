@@ -8,7 +8,7 @@ This an Android App that helps calculate the exchange rate from one currency to 
 ### Features:
   1. To make the app usable when there's no internet connection, all supported currencies are stored locally so users can still choose the base and target code in the spinners. Converting history is also stored so when user choose a base and target code pair existing in the database, the result is directly shown. However, if this pair has never been converted before when network is connected, no result is given. Here, reason to store converting history instead of all base-target pairs is because it really takes a long time to request for converting rates of all currencies. Additionally, not every currency pair will be needed so it will be waste of space. Finally, a lot of API calls need to be made and this is also burden for server.    
   2. Once network is disconnected while user is using the app, network monitor will pop up a dialog to remind user. User can also directly go to the network setting to make further actions.   
-  3. For better user experience, user's last converting request will be remembered. Even if the app is closed, next time user opens the app, all the information including currencies, converting result and last-updated-time are restored.   
+  3. For better user experience, user's last converting request will be remembered. Even if the app is closed, next time user opens the app, all the information that is the app state including currencies, converting result and last-updated-time are restored.   
 
 ### Api used:
 The currency exchange rate is obtained from https://www.exchangerate-api.com/docs/. There is an API request quota of 1500 per month since the API key for requesting is personal.
@@ -41,8 +41,10 @@ This bug happens when I try to show a toast in the network callback. It reminds 
   2. in-app advertisements: We can show in-app advertisements to users to make profits.
   3. nation flags for currencies: A national flag can be put next to the currency code, which will speed up the process of choosing the right currency for users. Since images are sometimes more conspicuous than text. 
   4. payment: Users can make payments to get some priviliges, e.g. subscription for no in-app advertisements, unlimited amount of request per month etc.
+  5. add viewModel to make Activity simpler. Currently, Activity is responsible for both UI update and business logic, which makes it cumbersome.
 
 ### Versions until now:
+  release v4: add support for updating local database, use sharedPreferences to store and restore app state    
   release v3: add Room database to store all supported currencies and converting history    
   release v2: add error handling for no internet and invalid API key, last updated time, network monitor    
   release v1
