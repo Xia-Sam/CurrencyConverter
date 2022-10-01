@@ -6,6 +6,7 @@ This an Android App that helps calculate the exchange rate from one currency to 
 
 ### Features:
   1. To make the app usable when there's no internet connection, all supported currencies are stored locally so users can still choose the base and target code in the spinners. Converting history is also stored so when user choose a base and target code pair existing in the database, the result is directly shown. However, if this pair has never been converted before when network is connected, no result is given. Here, reason to store converting history instead of all base-target pairs is because it really takes a long time to request for converting rates of all currencies. Additionally, not every currency pair will be needed so it will be waste of space. Finally, a lot of API calls need to be made and this is also burden for server.    
+  2. Once network is disconnected while user is using the app, network monitor will pop up a dialog to remind user. User can also directly go to the network setting to make further actions.   
 
 ### Api used:
 The currency exchange rate is obtained from https://www.exchangerate-api.com/docs/. There is an API request quota of 1500 per month since the API key for requesting is personal.
