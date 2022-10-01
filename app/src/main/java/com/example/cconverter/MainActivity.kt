@@ -27,8 +27,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private lateinit var binding: ActivityMainBinding
     val extrangeRateApi = ExtrangeRateApi.create()
     lateinit var supportedCodes: List<List<String>>
-    private var baseCode = "AED"
-    private var targetCode = "AED"
+    private lateinit var baseCode: String
+    private lateinit var targetCode: String
     private var amount = 1.0f
     private val clickListener = View.OnClickListener {
         when (it.id) {
@@ -47,6 +47,14 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         networkMonitor.init(this)
         supportedCodeDataBase = DataSource.getSupportedCodeDao(this)
         codeConversionDataBase = DataSource.getCodeConversionDao(this)
+        val sp = getSharedPreferences("cconverter", Context.MODE_PRIVATE).also {
+            baseCode = it.getString("baseCode", "AED").toString()
+            targetCode = it.getString("targetCode", "AED").toString()
+            amount = it.getFloat("amount", 1.0f)
+            binding.amount.setText(amount.toString())
+            binding.timeLastUpdated.text = it.getString("lastUpdatedTime", "")
+            binding.afterAmount.text = it.getString("afterAmount", "")
+        }
 
         try {
             lifecycleScope.launch(Dispatchers.IO) {
@@ -83,12 +91,12 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                         .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     with(binding.toCurrency) {
                         adapter = arrayAdapter
-                        setSelection(0, false)
+                        setSelection(sp.getInt("toCurrencyPos", 0), false)
                         onItemSelectedListener = this@MainActivity
                     }
                     with(binding.fromCurrency) {
                         adapter = arrayAdapter
-                        setSelection(0, false)
+                        setSelection(sp.getInt("fromCurrencyPos", 0), false)
                         onItemSelectedListener = this@MainActivity
                     }
                 }
@@ -103,6 +111,19 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     override fun onDestroy() {
         super.onDestroy()
         networkMonitor.finish()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "ONSTOP, saving app state...")
+        with (getSharedPreferences("cconverter", Context.MODE_PRIVATE).edit()) {
+            putString("baseCode", baseCode)
+            putString("targetCode", targetCode)
+            putFloat("amount", amount)
+            putString("lastUpdatedTime", binding.timeLastUpdated.text.toString())
+            putString("afterAmount", binding.afterAmount.text.toString())
+            apply()
+        }
     }
 
     private fun showResult() {
@@ -121,6 +142,7 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
             return
         }
+
         val call = extrangeRateApi.getConversionResult(baseCode, targetCode, amount)
         Log.d(
             TAG, "Conversion result requested: " +
@@ -158,29 +180,30 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     }
                 }
             }
-
             override fun onFailure(call: Call<PairConversion>, t: Throwable) {
                 Utils.showToast(
                     this@MainActivity,
                     "Failed to call API, error: " + "${t.message}"
                 )
             }
-
         })
-
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        val editor = getSharedPreferences("cconverter", Context.MODE_PRIVATE).edit()
         when (parent) {
             binding.fromCurrency -> {
                 baseCode = supportedCodes[position][0]
+                editor.putInt("fromCurrencyPos", position)
                 Log.d(TAG, "base code changed to $baseCode, position=$position")
             }
             binding.toCurrency -> {
                 targetCode = supportedCodes[position][0]
+                editor.putInt("toCurrencyPos", position)
                 Log.d(TAG, "target code changed to $targetCode, position=$position")
             }
         }
+        editor.apply()
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {

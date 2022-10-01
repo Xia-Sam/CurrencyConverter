@@ -51,7 +51,7 @@
             android:layout_height="match_parent"
             android:gravity="end"
             android:inputType="number"
-            android:text="@string/default_amount"/>
+            tools:text="@string/default_amount"/>
     </LinearLayout>
 
     <LinearLayout
