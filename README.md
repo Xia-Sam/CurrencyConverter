@@ -31,13 +31,13 @@ After getting this bug, I checked whether my api is working fine or not. Then th
   3. android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views    
 This bug happens when I try to show a toast in the network callback. It reminds me that in Android, only the main thread can update views. When this is done from a worker thread, an exception is thrown. So I launched a coroutine with 'Dispatchers.Main' passed to show the toast hence the problem is solved.
   
-### Further improvements in the future:
+### Further improvements and features in the future:
   1. user account: Each user can use their email address and password to login to the app.
   2. in-app advertisements: We can show in-app advertisements to users to make profits.
   3. nation flags for currencies: A national flag can be put next to the currency code, which will speed up the process of choosing the right currency for users. Since images are sometimes more conspicuous than text. 
   4. payment: Users can make payments to get some priviliges, e.g. subscription for no in-app advertisements, unlimited amount of request per month etc.
 
-### versions until now:
+### Versions until now:
 
   release v2: add error handling for no internet and invalid API key, last updated time, network monitor    
   release v1
