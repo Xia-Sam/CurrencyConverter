@@ -151,8 +151,10 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                                 )
                             )
                             Log.d(TAG, "one code conversion stored: $baseCode, $targetCode")
+                        } else {
+                            codeConversionDataBase.update(baseCode, targetCode, result/amount, time)
+                            Log.d(TAG, "one code conversion updated: $baseCode, $targetCode")
                         }
-
                     }
                 }
             }

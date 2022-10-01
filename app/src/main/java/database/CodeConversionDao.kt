@@ -13,8 +13,14 @@ interface CodeConversionDao {
     @Delete
     fun deleteCodeConversion(code: CodeConversion)
 
-    @Query("SELECT * FROM code_conversions WHERE base_code= :baseCode AND target_code= :targetCode")
+    @Query("SELECT * FROM code_conversions " +
+            "WHERE base_code= :baseCode AND target_code= :targetCode")
     fun getCodeConversion(baseCode: String, targetCode: String): CodeConversion?
+
+    @Query("UPDATE code_conversions " +
+            "SET rate= :newRate, last_updated_time= :newTime " +
+            "WHERE base_code= :baseCode AND target_code= :targetCode")
+    fun update(baseCode: String, targetCode: String, newRate: Float, newTime: String)
 
     @Query("SELECT * FROM code_conversions")
     fun getAllCodeConversions(): List<CodeConversion>
