@@ -9,9 +9,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import com.example.cconverter.databinding.ActivityMainBinding
-import database.DataSource
-import database.SupportedCode
-import database.SupportedCodeDao
+import database.*
 import datasource.ExtrangeRateApi
 import datasource.PairConversion
 import datasource.SupportedCodes
@@ -38,7 +36,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         }
     }
     private val networkMonitor = NetworkMonitor()
-    private lateinit var dataBase: SupportedCodeDao
+    private lateinit var supportedCodeDataBase: SupportedCodeDao
+    private lateinit var codeConversionDataBase: CodeConversionDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +45,8 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         setContentView(binding.root)
 
         networkMonitor.init(this)
-        dataBase = DataSource.getDao(this)
+        supportedCodeDataBase = DataSource.getSupportedCodeDao(this)
+        codeConversionDataBase = DataSource.getCodeConversionDao(this)
 
         try {
             lifecycleScope.launch(Dispatchers.IO) {
@@ -54,14 +54,21 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     // Update local database
                     val response = extrangeRateApi.getSupportedCodes().execute()
                     supportedCodes = response.body()!!.supported_codes
-                    dataBase.removeAllSupportedCodes()
+                    supportedCodeDataBase.removeAllSupportedCodes()
                     for (codeList in supportedCodes) {
-                        dataBase.insertSupportedCode(SupportedCode(0, codeList[0], codeList[1]))
+                        supportedCodeDataBase.insertSupportedCode(
+                            SupportedCode(0, codeList[0], codeList[1])
+                        )
                     }
+                    Log.d(
+                        TAG, "database updated successfully, " +
+                                "codes in total: ${supportedCodes.size}"
+                    )
+
                 } else {
                     // Get supported codes from local database
                     val l = mutableListOf<List<String>>()
-                    for (scode in dataBase.getAllSupportedCodes()) {
+                    for (scode in supportedCodeDataBase.getAllSupportedCodes()) {
                         l.add(listOf(scode.code, scode.currency))
                     }
                     supportedCodes = l
@@ -99,7 +106,21 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     private fun showResult() {
+        binding.timeLastUpdated.text = ""
+        binding.afterAmount.text = ""
+
         amount = binding.amount.text.toString().toFloat()
+        if (!networkMonitor.isNetworkAvailable()) {
+            lifecycleScope.launch(Dispatchers.IO) {
+                codeConversionDataBase.getCodeConversion(baseCode, targetCode)?.let {
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        binding.timeLastUpdated.text = it.last_updated_time
+                        binding.afterAmount.text = (amount * (it.rate)).toString()
+                    }
+                }
+            }
+            return
+        }
         val call = extrangeRateApi.getConversionResult(baseCode, targetCode, amount)
         Log.d(
             TAG, "Conversion result requested: " +
@@ -113,8 +134,26 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 if (response.body() == null) {
                     Utils.showToast(this@MainActivity, "API key is invalid")
                 } else {
-                    binding.timeLastUpdated.text = response.body()?.time_last_update_utc
-                    binding.afterAmount.text = response.body()?.conversion_result.toString()
+                    val time = response.body()!!.time_last_update_utc
+                    binding.timeLastUpdated.text = time
+                    val result = response.body()!!.conversion_result
+                    binding.afterAmount.text = result.toString()
+
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        if (codeConversionDataBase.getCodeConversion(baseCode, targetCode)==null) {
+                            codeConversionDataBase.insertCodeConversion(
+                                CodeConversion(
+                                    0,
+                                    baseCode,
+                                    targetCode,
+                                    result/amount,
+                                    time
+                                )
+                            )
+                            Log.d(TAG, "one code conversion stored: $baseCode, $targetCode")
+                        }
+
+                    }
                 }
             }
 

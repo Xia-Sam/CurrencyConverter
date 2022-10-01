@@ -27,4 +27,7 @@ interface ExtrangeRateApi {
         @Path("target") targetCode: String,
         @Path("amount") currencyAmount: Float
     ): Call<PairConversion>
+
+    @GET("v6/d3388a1cdd64c0a51fbe2347/latest/{code}")
+    fun getAllRatesForCurrency(@Path("code") baseCode: String): Call<AllRatesForCurrency>
 }

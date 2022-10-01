@@ -32,14 +32,16 @@ class NetworkMonitor {
 
         override fun onLost(network: Network) {
             super.onLost(network)
-            MaterialAlertDialogBuilder(context)
-                .setTitle("Network disconnected")
-                .setMessage("Go to network setting?")
-                .setPositiveButton("yes") { _, _ ->
-                    startActivity(context, Intent(Settings.ACTION_WIRELESS_SETTINGS), null)
-                }
-                .setNegativeButton("cancel") { _, _ -> }
-                .show()
+            GlobalScope.launch(Dispatchers.Main) {
+                MaterialAlertDialogBuilder(context)
+                    .setTitle("Network disconnected")
+                    .setMessage("Go to network setting?")
+                    .setPositiveButton("yes") { _, _ ->
+                        startActivity(context, Intent(Settings.ACTION_WIRELESS_SETTINGS), null)
+                    }
+                    .setNegativeButton("cancel") { _, _ -> }
+                    .show()
+            }
         }
     }
 

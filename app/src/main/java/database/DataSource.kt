@@ -5,13 +5,25 @@ import androidx.room.Room
 
 class DataSource {
     companion object {
-        fun getDao(context: Context): SupportedCodeDao {
-            val db = Room.databaseBuilder(
+        private var db : AppDatabase? = null
+        private fun init(context: Context) {
+            db = Room.databaseBuilder(
                 context,
-                AppDatabase::class.java, "supported_codes_database"
+                AppDatabase::class.java, "currency_code_database"
             ).build()
+        }
+        fun getSupportedCodeDao(context: Context): SupportedCodeDao {
+            if (db == null) {
+                init(context)
+            }
+            return db!!.supportedCodeDao()
+        }
 
-            return db.supportedCodeDao()
+        fun getCodeConversionDao(context: Context): CodeConversionDao {
+            if (db == null) {
+                init(context)
+            }
+            return db!!.codeConversionDao()
         }
     }
 }
