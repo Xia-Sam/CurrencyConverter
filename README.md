@@ -1,4 +1,5 @@
 # CurrencyConverter
+![currency converter](https://github.com/Xia-Sam/CurrencyConverter/blob/master/app/src/main/res/drawable/currency_converter.jpg)
 
 This an Android App that helps calculate the exchange rate from one currency to another.
 
