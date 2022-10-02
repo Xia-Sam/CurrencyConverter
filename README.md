@@ -1,9 +1,12 @@
 # CurrencyConverter
-![currency converter](https://github.com/Xia-Sam/CurrencyConverter/blob/master/app/src/main/res/drawable/currency_converter.jpg)
+![image](https://user-images.githubusercontent.com/39165351/193457022-4e5ed5d9-c0ee-4483-b6be-aabdb7844688.png)
 
 This an Android App that helps calculate the exchange rate from one currency to another.
 
 ### Code architecture:
+To struture the app's code and give it a modular design, a popular architecture MVC(model-view-controller) is applied. The main idea is to organize the code in a proper way so that different features are seperated and become easier to test and maintain. For example in this app, Room and Api service act like Model and activity acts like the controller where it's responsible for data processing and updating the views. Details are shown in the picture below:
+![image](https://user-images.githubusercontent.com/39165351/193456996-089fd367-2c66-46f4-987a-714101a91d30.png)
+
 
 ### Features:
   1. To make the app usable when there's no internet connection, all supported currencies are stored locally so users can still choose the base and target code in the spinners. Converting history is also stored so when user choose a base and target code pair existing in the database, the result is directly shown. However, if this pair has never been converted before when network is connected, no result is given. Here, reason to store converting history instead of all base-target pairs is because it really takes a long time to request for converting rates of all currencies. Additionally, not every currency pair will be needed so it will be waste of space. Finally, a lot of API calls need to be made and this is also burden for server.    
@@ -41,7 +44,8 @@ This bug happens when I try to show a toast in the network callback. It reminds 
   2. in-app advertisements: We can show in-app advertisements to users to make profits.
   3. nation flags for currencies: A national flag can be put next to the currency code, which will speed up the process of choosing the right currency for users. Since images are sometimes more conspicuous than text. 
   4. payment: Users can make payments to get some priviliges, e.g. subscription for no in-app advertisements, unlimited amount of request per month etc.
-  5. add viewModel to make Activity simpler. Currently, Activity is responsible for both UI update and business logic, which makes it cumbersome.
+  5. add viewModel to adopt MVVM architecture strategy to make Activity simpler. Currently, Activity is responsible for both UI update and business logic, which makes it cumbersome.
+  6. language: add multi-language support so more users understanding other languages can also use the app.
 
 ### Versions until now:
   release v4: add support for updating local database, use sharedPreferences to store and restore app state    
